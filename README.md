@@ -1,4 +1,4 @@
-## Laboratorio 1 Modelación y Simulación
+# Laboratorio 1 Modelación y Simulación
 
 ## Integrantes
 - Gustavo González
