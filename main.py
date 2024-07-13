@@ -9,7 +9,7 @@ VELOCITY_RANGE = (-1, 1)
 W = 0.5
 C1 = 1.5
 C2 = 1.5
-EPOCHS = 100
+EPOCHS = 101
 DIMENSIONS = 2
 DESCENDING = True
 
@@ -30,9 +30,10 @@ class Particle:
 
 def main():
     random.seed(0)
-    velocity, particles, global_best_value = init_vars()
+    velocity, particles, global_best_value, global_best_position = init_vars()
+    contour_plot(particles)
 
-    for _ in range(EPOCHS):
+    for epoch_no in range(EPOCHS):
         # TODO: revisar esto
         for particle in particles:
             particle.velocity = get_next_velocity(velocity, global_best_value, particle)
@@ -47,15 +48,24 @@ def main():
             if (DESCENDING and position_value_z < global_best_value) or (
                     not DESCENDING and position_value_z > global_best_value):
                 global_best_value = position_value_z
+                global_best_position = particle.position
 
-    print(global_best_value)
-    print_xy(particles)
+        if epoch_no % 50 == 0:
+            contour_plot(particles)
+
+    print(f"Best value: {global_best_value}")
+    print(f"Best position: {global_best_position}")
+
+
+
+
+
 
 def init_vars():
     velocity = random.uniform(-1, 1)
     particles = [Particle() for _ in range(PARTICLE_NO)]
     global_best = max(particles, key=lambda p: function_(p.best_position))
-    return velocity, particles, global_best.best_value
+    return velocity, particles, global_best.best_value, global_best.best_position
 
 
 def function_(vector: np.ndarray) -> np.float64:
@@ -75,24 +85,39 @@ def next_position(position, velocity):
     return position + velocity
 
 
-def print_xy(particles):
-    particle_pos = []
-    for particle in particles:
-        particle_pos.append(particle.position)
+def contour_plot(particles):
+    particle_pos = [particle.position for particle in particles]
+
 
     # Unzip the list of tuples into two lists: x and y
-    x, y = zip(*particle_pos)
+    x_, y_ = zip(*particle_pos)
+    max_y = max(y_)
+    min_y = min(y_)
+    max_x = max(x_)
+    min_x = min(x_)
 
-    # Create the scatterplot
-    plt.scatter(x, y)
+    # Create a mesh grid for the contour plot
+    x = np.linspace(min_x, max_x, 100)
+    y = np.linspace(min_y, max_y, 100)
+    X, Y = np.meshgrid(x, y)
+    param = (X, Y)
+    Z = function_(param)
 
-    # Add labels and title
-    plt.xlabel('X-axis label')
-    plt.ylabel('Y-axis label')
-    plt.title('Scatterplot Title')
+    # Specify the number of levels or an array of custom levels
+    num_levels = 20  # For example, 20 levels
+    levels = np.linspace(Z.min(), Z.max(), num_levels)
 
-    # Show the plot
+    # Plot the contour plot and scatter plot on the same figure
+    plt.figure()
+    cp = plt.contour(X, Y, Z, levels=levels)
+    plt.clabel(cp, inline=True, fontsize=10)
+    plt.scatter(x_, y_, color='red')  # Optional: Customize scatter plot appearance
+    plt.title('Curvas de Nivel con Scatter Plot')
+    plt.xlabel('x')
+    plt.ylabel('y')
     plt.show()
+
+
 
 if __name__ == "__main__":
     main()
