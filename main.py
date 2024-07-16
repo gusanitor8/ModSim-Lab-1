@@ -13,6 +13,11 @@ EPOCHS = 101
 DIMENSIONS = 2
 DESCENDING = True
 
+parameter_sets = [
+    {'W': 0.4, 'C1': 1.3, 'C2': 1.4, 'label': 'SET A'},
+    {'W': 0.6, 'C1': 1.7, 'C2': 1.8, 'label': 'SET B'},
+    {'W': 0.8, 'C1': 2.0, 'C2': 2.1, 'label': 'SET C'}
+]
 
 @dataclass
 class Particle:
@@ -30,33 +35,43 @@ class Particle:
 
 def main():
     random.seed(0)
-    velocity, particles, global_best_value, global_best_position = init_vars()
-    contour_plot(particles, "Inicio")
 
-    for epoch_no in range(EPOCHS):
-        # TODO: revisar esto
-        for particle in particles:
-            particle.velocity = get_next_velocity(velocity, global_best_value, particle)
-            particle.position = next_position(particle.position, particle.velocity)
-            position_value_z = function_(particle.position)
+    for param_set in parameter_sets:
 
-            if (DESCENDING and position_value_z < particle.best_value) or (
-                    not DESCENDING and position_value_z > particle.best_value):
-                particle.best_position = particle.position
-                particle.best_value = position_value_z
+        velocity, particles, global_best_value, global_best_position = init_vars()
+        
+        W = param_set['W']
+        C1 = param_set['C1']
+        C2 = param_set['C2']
+        set_label = param_set['label']
 
-            if (DESCENDING and position_value_z < global_best_value) or (
-                    not DESCENDING and position_value_z > global_best_value):
-                global_best_value = position_value_z
-                global_best_position = particle.position
+        contour_plot(particles, f"Inicio {set_label}")
 
-        if epoch_no == EPOCHS // 2:
-            contour_plot(particles, "Mitad")
-        if epoch_no == EPOCHS - 1:
-            contour_plot(particles, "Final")
+        for epoch_no in range(EPOCHS):
+            # TODO: revisar esto
+            for particle in particles:
+                particle.velocity = get_next_velocity(velocity, global_best_value, particle)
+                particle.position = next_position(particle.position, particle.velocity)
+                position_value_z = function_(particle.position)
 
-    print(f"Best value: {global_best_value}")
-    print(f"Best position: {global_best_position}")
+                if (DESCENDING and position_value_z < particle.best_value) or (
+                        not DESCENDING and position_value_z > particle.best_value):
+                    particle.best_position = particle.position
+                    particle.best_value = position_value_z
+
+                if (DESCENDING and position_value_z < global_best_value) or (
+                        not DESCENDING and position_value_z > global_best_value):
+                    global_best_value = position_value_z
+                    global_best_position = particle.position
+
+            if epoch_no == EPOCHS // 2:
+                contour_plot(particles, f"Mitad {set_label}")
+            if epoch_no == EPOCHS - 1:
+                contour_plot(particles, f"Final {set_label}")
+
+        print(f"Set: {set_label}")
+        print(f"Best value: {global_best_value}")
+        print(f"Best position: {global_best_position}")
 
 
 
@@ -120,7 +135,6 @@ def contour_plot(particles, title=""):
 
     # Save the figure as a PNG file
     plt.savefig(f"out/{title}.png")
-    
     plt.show()
 
 
