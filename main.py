@@ -31,7 +31,7 @@ class Particle:
 def main():
     random.seed(0)
     velocity, particles, global_best_value, global_best_position = init_vars()
-    contour_plot(particles)
+    contour_plot(particles, "Inicio")
 
     for epoch_no in range(EPOCHS):
         # TODO: revisar esto
@@ -50,8 +50,10 @@ def main():
                 global_best_value = position_value_z
                 global_best_position = particle.position
 
-        if epoch_no % 50 == 0:
-            contour_plot(particles)
+        if epoch_no == EPOCHS // 2:
+            contour_plot(particles, "Mitad")
+        if epoch_no == EPOCHS - 1:
+            contour_plot(particles, "Final")
 
     print(f"Best value: {global_best_value}")
     print(f"Best position: {global_best_position}")
@@ -85,7 +87,7 @@ def next_position(position, velocity):
     return position + velocity
 
 
-def contour_plot(particles):
+def contour_plot(particles, title=""):
     particle_pos = [particle.position for particle in particles]
 
 
@@ -112,9 +114,13 @@ def contour_plot(particles):
     cp = plt.contour(X, Y, Z, levels=levels)
     plt.clabel(cp, inline=True, fontsize=10)
     plt.scatter(x_, y_, color='red')  # Optional: Customize scatter plot appearance
-    plt.title('Curvas de Nivel con Scatter Plot')
+    plt.title(f"Curvas de Nivel con Scatter Plot - {title}")
     plt.xlabel('x')
     plt.ylabel('y')
+
+    # Save the figure as a PNG file
+    plt.savefig(f"out/{title}.png")
+    
     plt.show()
 
 
