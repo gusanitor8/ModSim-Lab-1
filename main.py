@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 PARTICLE_NO = 40
 POSITION_RANGE = (-10, 10)  # we asume the range has a form of an N dimensional cube
 VELOCITY_RANGE = (-1, 1)
-W = 0.5
-C1 = 1.5
-C2 = 1.5
 EPOCHS = 101
 DIMENSIONS = 2
 DESCENDING = True
@@ -40,9 +37,9 @@ def main():
 
         velocity, particles, global_best_value, global_best_position = init_vars()
         
-        W = param_set['W']
-        C1 = param_set['C1']
-        C2 = param_set['C2']
+        w = param_set['W']
+        c1 = param_set['C1']
+        c2 = param_set['C2']
         set_label = param_set['label']
 
         contour_plot(particles, f"Inicio {set_label}")
@@ -50,7 +47,7 @@ def main():
         for epoch_no in range(EPOCHS):
             # TODO: revisar esto
             for particle in particles:
-                particle.velocity = get_next_velocity(velocity, global_best_value, particle)
+                particle.velocity = get_next_velocity(velocity, global_best_value, particle, w, c1, c2)
                 particle.position = next_position(particle.position, particle.velocity)
                 position_value_z = function_(particle.position)
 
@@ -91,7 +88,7 @@ def function_(vector: np.ndarray) -> np.float64:
     return np.float64((x - 3) ** 2 + (y - 2) ** 2)
 
 
-def get_next_velocity(velocity, global_best, particle: Particle):
+def get_next_velocity(velocity, global_best, particle: Particle, W, C1, C2):
     inertia = W * velocity
     cognitive = C1 * random.random() * (particle.best_position - particle.position)
     social = C2 * random.random() * (global_best - particle.position)
