@@ -14,7 +14,9 @@ Best position: [3.02468879 2.01448959]
 ## Contour Plot
 1. Principio  
    ![out/Figure_1.png](out/Figure_1.png)
-2. Mitad  
+2. Mitad A
    ![out/Figure_2.png](out/Figure_2.png)
-3. Final  
+3. Mitad B  
     ![out/Figure_3.png](out/Figure_3.png)
+4. Final
+ ![alt text](out/Figure_4.png)
